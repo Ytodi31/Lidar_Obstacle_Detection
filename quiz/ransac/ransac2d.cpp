@@ -65,18 +65,43 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 {
 	std::unordered_set<int> inliersResult;
 	srand(time(NULL));
-	
+
 	// TODO: Fill in this function
-
-	// For max iterations 
-
-	// Randomly sample subset and fit line
-
-	// Measure distance between every point and fitted line
-	// If distance is smaller than threshold count it as inlier
-
-	// Return indicies of inliers from fitted line with most inliers
-	
+	int l = cloud->points.size();
+	// For max iterations
+	std::pair<int, int> random;
+	std::pair<float, float> point1;
+	std::pair<float, float> point2;
+	int inliers;
+	float A, B, C;
+	int max = 0;
+	float d;
+	int counter = 0;
+	while (counter <= maxIterations){
+		random.first = rand() % (l);
+		random.second = rand() %(l);
+		point1.first = cloud->points[random.first].x;
+		point1.second = cloud->points[random.first].y;
+		point2.first = cloud->points[random.second].x;
+		point2.second = cloud->points[random.second].y;
+		inliers = 0;
+		std::vector<int> v;
+		for (int i = 0; i < l; i++){
+			A = point2.second - point1.second;
+			B = point2.first - point1.first;
+			C = point1.first*point2.second - point2.second*point1.second;
+			d = fabs(A*cloud->points[i].x + B*cloud->points[i].y + C)/sqrt(A*A + B*B);
+			if (d <= distanceTol){
+				inliers +=1;
+				v.push_back(i);
+			}
+		}
+		if(inliers>max){
+			max = inliers;
+			std::copy(v.begin(),v.end(),std::inserter(inliersResult,inliersResult.end()));
+		}
+		counter +=1;
+	}
 	return inliersResult;
 
 }
@@ -89,10 +114,10 @@ int main ()
 
 	// Create data
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = CreateData();
-	
+
 
 	// TODO: Change the max iteration and distance tolerance arguments for Ransac function
-	std::unordered_set<int> inliers = Ransac(cloud, 0, 0);
+	std::unordered_set<int> inliers = Ransac(cloud, 10, 1.0);
 
 	pcl::PointCloud<pcl::PointXYZ>::Ptr  cloudInliers(new pcl::PointCloud<pcl::PointXYZ>());
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOutliers(new pcl::PointCloud<pcl::PointXYZ>());
@@ -117,10 +142,10 @@ int main ()
   	{
   		renderPointCloud(viewer,cloud,"data");
   	}
-	
+
   	while (!viewer->wasStopped ())
   	{
   	  viewer->spinOnce ();
   	}
-  	
+
 }
