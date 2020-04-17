@@ -1,4 +1,4 @@
-// PCL lib Functions for processing point clouds 
+// PCL lib Functions for processing point clouds
 
 #include "processPointClouds.h"
 
@@ -39,7 +39,7 @@ typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(ty
 
 
 template<typename PointT>
-std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::SeparateClouds(pcl::PointIndices::Ptr inliers, typename pcl::PointCloud<PointT>::Ptr cloud) 
+std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::SeparateClouds(pcl::PointIndices::Ptr inliers, typename pcl::PointCloud<PointT>::Ptr cloud)
 {
   // TODO: Create two new point clouds, one cloud with obstacles and other with segmented plane
 
@@ -53,8 +53,25 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
 {
     // Time segmentation process
     auto startTime = std::chrono::steady_clock::now();
-	pcl::PointIndices::Ptr inliers;
+	  pcl::PointIndices::Ptr inliers;
     // TODO:: Fill in this function to find inliers for the cloud.
+
+    inliers = new pcl::PointIndices();
+    pcl::SACSegmentation<PointT> seg;
+    pcl::ModelCoefficients::Ptr coeffients = new pcl::ModelCoefficients();
+
+    // Setting hyper-parameters of segmentation model
+    seg.setModelTtpe(pcl::SACMODEL_PLANE);
+    seg.setMethodType(pcl::SAC_RANSAC);
+    seg.setMaxIterations(maxIterations);
+    seg.setDistanceThreshold(distanceThreshold);
+
+    // segmentation
+    seg.setInputCLoud(cloud);
+    seg.segment(*inliers, *coeffients);
+    if (inliers -> indices.size() == 0){
+      std::cout << " Could not find a planar model for the given cloud input" << std::endl;
+    }
 
     auto endTime = std::chrono::steady_clock::now();
     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
