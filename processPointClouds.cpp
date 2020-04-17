@@ -42,8 +42,20 @@ template<typename PointT>
 std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::SeparateClouds(pcl::PointIndices::Ptr inliers, typename pcl::PointCloud<PointT>::Ptr cloud)
 {
   // TODO: Create two new point clouds, one cloud with obstacles and other with segmented plane
+    typename pcl::PointCloud<PointT>::Ptr road{new pcl::PointCloud<PointT>()};
+    typename pcl::PointCloud<PointT>::Ptr obstacle{new pcl::PointCloud<PointT>()};
+    for (auto index : inliers->indices){
+      road->points.push_back(cloud->points[index]);
+    }
 
-    std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> segResult(cloud, cloud);
+    pcl::ExtractIndices<PointT> extract;
+    extract.setInputCloud(cloud);
+    extract.setIndices(inliers);
+    extract.setNegative(true);
+    extract.filter(*obstacle);
+
+
+    std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> segResult(obstacle, road);
     return segResult;
 }
 
@@ -53,22 +65,21 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
 {
     // Time segmentation process
     auto startTime = std::chrono::steady_clock::now();
-	  pcl::PointIndices::Ptr inliers;
+	  pcl::PointIndices::Ptr inliers{new pcl::PointIndices};
     // TODO:: Fill in this function to find inliers for the cloud.
 
-    inliers = new pcl::PointIndices();
     pcl::SACSegmentation<PointT> seg;
-    pcl::ModelCoefficients::Ptr coeffients = new pcl::ModelCoefficients();
+    pcl::ModelCoefficients::Ptr coefficients{new pcl::ModelCoefficients};
 
     // Setting hyper-parameters of segmentation model
-    seg.setModelTtpe(pcl::SACMODEL_PLANE);
+    seg.setModelType(pcl::SACMODEL_PLANE);
     seg.setMethodType(pcl::SAC_RANSAC);
     seg.setMaxIterations(maxIterations);
     seg.setDistanceThreshold(distanceThreshold);
 
     // segmentation
-    seg.setInputCLoud(cloud);
-    seg.segment(*inliers, *coeffients);
+    seg.setInputCloud(cloud);
+    seg.segment(*inliers, *coefficients);
     if (inliers -> indices.size() == 0){
       std::cout << " Could not find a planar model for the given cloud input" << std::endl;
     }
