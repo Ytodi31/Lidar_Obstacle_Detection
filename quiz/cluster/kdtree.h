@@ -15,6 +15,7 @@ struct Node
 	Node(std::vector<float> arr, int setId)
 	:	point(arr), id(setId), left(NULL), right(NULL)
 	{}
+
 };
 
 struct KdTree
@@ -25,40 +26,36 @@ struct KdTree
 	: root(NULL)
 	{}
 
-	void insert(std::vector<float> point, int id)
-	{
-		// TODO: Fill in this function to insert a new point into the tree
-		// the function should create a new node and place correctly with in the root
-		int depth = 0;
-		add_node(&root, depth, point, id);
+
+	void insert(std::vector<float> point, int id){
+			// TODO: Fill in this function to insert a new point into the tree
+			// the function should create a new node and place correctly with in the root
+			int depth = 0;
+			add_node(&root, depth, point, id);
 	}
 
-	void add_node(Node** node, int depth, std::vector<float> point, int id)
-	{
-		if(*node==NULL){
-			*node = new Node(point,id);
-		} else {
-			int d = depth%2;
-			if(point[d] < (*node)->point[d])
-				add_node(&((*node)->left), depth+1, point, id);
-			else
-			  add_node(&((*node)->right), depth+1, point, id);
+	void add_node(Node** node, int depth, std::vector<float> point, int id){
+			if((*node)==NULL)
+				(*node)= new Node(point,id);
+			else {
+				int d = depth%2;
+				if(point[d] < (*node)->point[d])
+					add_node(&((*node)->left), depth+1, point, id);
+				else
+				  add_node(&((*node)->right), depth+1, point, id);
+				}
+			}
 
-		}
-	}
-
-	// return a list of point ids in the tree that are within distance of target
+					// return a list of point ids in the tree that are within distance of target
 	std::vector<int> search(std::vector<float> target, float distanceTol)
 	{
-		std::vector<int> ids;
-		search_kdtree(&root, 0, ids, distanceTol, target);
-		return ids;
+						std::vector<int> ids;
+						search_kdtree(&root, 0, ids, distanceTol, target);
+			return ids;
 	}
 
 	void search_kdtree(Node** node, int depth, std::vector<int> &ids, float dist, const std::vector<float> &target){
 		if((*node)!=NULL){
-			// if ((target[0] -dist <= (*node)->point[0] || target[0]+dist >= (*node)->point[0]) &&
-			//     (target[1] -dist <= (*node)->point[1] || target[1]+dist >= (*node)->point[1]))
 			if(sqrt(pow((target[0] - (*node)->point[0]),2) + pow((target[1] - (*node)->point[1]),2)) <= dist)
 					ids.push_back((*node)->id);
 			int d = depth%2;
@@ -68,5 +65,4 @@ struct KdTree
 				search_kdtree((&(*node)->right), depth+1, ids, dist, target);
 			}
 		}
-
 };
