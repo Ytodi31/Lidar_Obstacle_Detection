@@ -66,6 +66,8 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
     for(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster : cloudClusters) {
       std::cout << "cluster size: " ;
       ptr_pointcloud->numPoints(cluster);
+      Box box = ptr_pointcloud->BoundingBox(cluster);
+      renderBox(viewer,box,clusterId);
       renderPointCloud(viewer, cluster, "ObstCloud"+std::to_string(clusterId), colors[clusterId]);
       ++clusterId;
     }
@@ -94,7 +96,15 @@ void initCamera(CameraAngle setAngle, pcl::visualization::PCLVisualizer::Ptr& vi
     if(setAngle!=FPS)
         viewer->addCoordinateSystem (1.0);
 }
-
+ void cityblock(pcl::visualization::PCLVisualizer::Ptr& viewer) {
+   ProcessPointClouds<pcl::PointXYZI>* ptr_pointcloudI = new ProcessPointClouds<pcl::PointXYZI>();
+   pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloud = ptr_pointcloudI ->loadPcd("../src/sensors/data/pcd/data_1/0000000000.pcd");
+   Eigen::Vector4f min (-1.5, -1.7, -1, 1);
+   Eigen::Vector4f max (2.6, 1.7, -4, 1);
+   pcl::PointCloud<pcl::PointXYZI>::Ptr filterCloud = ptr_pointcloudI ->FilterCloud(inputCloud, 1, min, max);
+   std::cout << "Filtered cloud size: " << filterCloud->size() << endl;
+   renderPointCloud(viewer, filterCloud, "CityPCD");
+ }
 
 int main (int argc, char** argv)
 {
@@ -103,8 +113,8 @@ int main (int argc, char** argv)
     pcl::visualization::PCLVisualizer::Ptr viewer (new pcl::visualization::PCLVisualizer ("3D Viewer"));
     CameraAngle setAngle = XY;
     initCamera(setAngle, viewer);
-    simpleHighway(viewer);
-
+    //simpleHighway(viewer);
+    cityblock(viewer);
     while (!viewer->wasStopped ())
     {
         viewer->spinOnce ();
