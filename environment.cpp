@@ -99,11 +99,28 @@ void initCamera(CameraAngle setAngle, pcl::visualization::PCLVisualizer::Ptr& vi
  void cityblock(pcl::visualization::PCLVisualizer::Ptr& viewer) {
    ProcessPointClouds<pcl::PointXYZI>* ptr_pointcloudI = new ProcessPointClouds<pcl::PointXYZI>();
    pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloud = ptr_pointcloudI ->loadPcd("../src/sensors/data/pcd/data_1/0000000000.pcd");
-   Eigen::Vector4f min (-1.5, -1.7, -1, 1);
-   Eigen::Vector4f max (2.6, 1.7, -4, 1);
-   pcl::PointCloud<pcl::PointXYZI>::Ptr filterCloud = ptr_pointcloudI ->FilterCloud(inputCloud, 1, min, max);
+   Eigen::Vector4f min(-20, -6, -4, 1);
+   Eigen::Vector4f max(20, 6, 4, 1);
+   pcl::PointCloud<pcl::PointXYZI>::Ptr filterCloud = ptr_pointcloudI ->FilterCloud(inputCloud, 0.2, min, max);
    std::cout << "Filtered cloud size: " << filterCloud->size() << endl;
-   renderPointCloud(viewer, filterCloud, "CityPCD");
+   std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud = ptr_pointcloudI->SegmentPlane(filterCloud, 100, 0.1);
+   //renderPointCloud(viewer, segmentCloud.first, "ObstacleCloud", Color(1,0,0));
+   //renderPointCloud(viewer, segmentCloud.second, "PlaneCloud", Color(0,1,0));
+   //renderPointCloud(viewer, filterCloud, "CityPCD");
+
+   std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = ptr_pointcloudI->Clustering(segmentCloud.first, 0.5 , 50, 1000);
+
+   int clusterId = 0;
+   std::vector<Color> colors = {Color(1, 0, 0), Color(1, 1, 0), Color(0, 0, 1)};
+   renderPointCloud(viewer, segmentCloud.second, "PlaneCloud", Color(0,1,0));
+   for(pcl::PointCloud<pcl::PointXYZI>::Ptr cluster : cloudClusters) {
+     std::cout << "cluster size: " ;
+     ptr_pointcloudI->numPoints(cluster);
+     Box box = ptr_pointcloudI->BoundingBox(cluster);
+     renderBox(viewer,box,clusterId);
+     renderPointCloud(viewer, cluster, "ObstCloud"+std::to_string(clusterId), colors[clusterId]);
+     ++clusterId;
+   }
  }
 
 int main (int argc, char** argv)
