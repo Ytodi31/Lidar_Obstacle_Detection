@@ -59,12 +59,9 @@ struct KdTree
 			//std::cout << "Target" << " x y z: " << target[0] << " " << target[1] << " " << target[2] << std::endl;
 			if(sqrt(pow((target[0] - (*node)->point[0]),2) +
 			        pow((target[1] - (*node)->point[1]),2) +
-							pow((target[2] -(*node)->point[2]), 2)) <= dist){
+							pow((target[2] -(*node)->point[2]), 2)) <= dist)
 					ids.push_back((*node)->id);
-					cout << "Distance: " <<  sqrt(pow((target[0] - (*node)->point[0]),2) +
-					        pow((target[1] - (*node)->point[1]),2) +
-									pow((target[2] -(*node)->point[2]), 2))<< endl ;
-				}
+
 			int d = depth%3;
 			if(target[d]-dist < (*node)->point[d])
 				search_kdtree((&(*node)->left), depth+1, ids, dist, target);
