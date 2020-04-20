@@ -101,7 +101,7 @@ void initCamera(CameraAngle setAngle, pcl::visualization::PCLVisualizer::Ptr& vi
    Eigen::Vector4f max(20, 6, 4, 1);
    pcl::PointCloud<pcl::PointXYZI>::Ptr filterCloud = ptr_pointcloudI ->FilterCloud(inputCloud, 0.2, min, max);
    // std::cout << "Filtered cloud size: " << filterCloud->size() << endl;
-   std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud = ptr_pointcloudI->SegmentPlane(filterCloud, 80, 0.1);
+   std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud = ptr_pointcloudI->SegmentPlane(filterCloud, 80, 0.2);
    //renderPointCloud(viewer, segmentCloud.first, "ObstacleCloud", Color(1,0,0));
    //renderPointCloud(viewer, segmentCloud.second, "PlaneCloud", Color(0,1,0));
    //renderPointCloud(viewer, filterCloud, "CityPCD");
@@ -126,7 +126,7 @@ int main (int argc, char** argv)
     std::cout << "starting enviroment" << std::endl;
 
     pcl::visualization::PCLVisualizer::Ptr viewer (new pcl::visualization::PCLVisualizer ("3D Viewer"));
-    CameraAngle setAngle = XY;
+    CameraAngle setAngle =FPS;
     initCamera(setAngle, viewer);
     //simpleHighway(viewer);
     ProcessPointClouds<pcl::PointXYZI>* ptr_pointcloudI = new ProcessPointClouds<pcl::PointXYZI>();
