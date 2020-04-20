@@ -18,6 +18,7 @@
 #include <ctime>
 #include <chrono>
 #include "render/box.h"
+#include "quiz/cluster/kdtree.h"
 #include <unordered_set>
 
 template<typename PointT>
@@ -32,6 +33,10 @@ public:
     void numPoints(typename pcl::PointCloud<PointT>::Ptr cloud);
 
     std::unordered_set<int> Ransac_plane(typename pcl::PointCloud<PointT>::Ptr cloud, int maxIterations, float distanceTol);
+
+    void proximately(int index, const std::vector<std::vector<float>>&points, std::vector<int>& cluster, std::vector<bool>& visited, KdTree* tree, float dist);
+
+    std::vector<std::vector<int>> euclideanCluster(const std::vector<std::vector<float>> points, KdTree* tree, float distanceTol);
 
     typename pcl::PointCloud<PointT>::Ptr FilterCloud(typename pcl::PointCloud<PointT>::Ptr cloud, float filterRes, Eigen::Vector4f minPoint, Eigen::Vector4f maxPoint);
 
