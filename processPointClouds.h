@@ -1,4 +1,4 @@
-// PCL lib Functions for processing point clouds 
+// PCL lib Functions for processing point clouds
 
 #ifndef PROCESSPOINTCLOUDS_H_
 #define PROCESSPOINTCLOUDS_H_
@@ -12,12 +12,13 @@
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/segmentation/extract_clusters.h>
 #include <pcl/common/transforms.h>
-#include <iostream> 
-#include <string>  
+#include <iostream>
+#include <string>
 #include <vector>
 #include <ctime>
 #include <chrono>
 #include "render/box.h"
+#include <unordered_set>
 
 template<typename PointT>
 class ProcessPointClouds {
@@ -29,6 +30,8 @@ public:
     ~ProcessPointClouds();
 
     void numPoints(typename pcl::PointCloud<PointT>::Ptr cloud);
+
+    std::unordered_set<int> Ransac_plane(typename pcl::PointCloud<PointT>::Ptr cloud, int maxIterations, float distanceTol);
 
     typename pcl::PointCloud<PointT>::Ptr FilterCloud(typename pcl::PointCloud<PointT>::Ptr cloud, float filterRes, Eigen::Vector4f minPoint, Eigen::Vector4f maxPoint);
 
@@ -45,6 +48,6 @@ public:
     typename pcl::PointCloud<PointT>::Ptr loadPcd(std::string file);
 
     std::vector<boost::filesystem::path> streamPcd(std::string dataPath);
-  
+
 };
 #endif /* PROCESSPOINTCLOUDS_H_ */
