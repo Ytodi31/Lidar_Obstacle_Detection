@@ -126,7 +126,7 @@ int main (int argc, char** argv)
     std::cout << "starting enviroment" << std::endl;
 
     pcl::visualization::PCLVisualizer::Ptr viewer (new pcl::visualization::PCLVisualizer ("3D Viewer"));
-    CameraAngle setAngle =FPS;
+    CameraAngle setAngle =XY;
     initCamera(setAngle, viewer);
     //simpleHighway(viewer);
     ProcessPointClouds<pcl::PointXYZI>* ptr_pointcloudI = new ProcessPointClouds<pcl::PointXYZI>();
