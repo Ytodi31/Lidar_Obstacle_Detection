@@ -35,7 +35,8 @@ To install : \
 `git clone https://github.com/Ytodi31/Lidar_Obstacle_Detection` \
 ` cd Lidar_Obstacle_Detection` \
 ` mkdir build ` \
-`cmake` \
+` cd  build` \
+`cmake ..` \
 `make` \
 `./enviroment`
 
